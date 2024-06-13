@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    meta.helm.sh/release-name: chart-workflow-sync-service
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: workflow-sync-service
+  name: workflow-sync-service
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: workflow-sync-service
+  template:
+    metadata:
+      labels:
+        app: workflow-sync-service
+      annotations:
+        iam.amazonaws.com/role: {{ .Values.namespace }}/{{ .Values.environment }}-eks-namespace-{{ .Values.namespace }}-default
+
+    spec:
+      serviceAccountName: vault-{{ .Values.namespace }}
+      containers:
+        - name: workflow-sync-service
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullpolicy }}
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /workflow-sync-service/actuator/health/ping
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /workflow-sync-service/actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            limits:
+              memory: 350Mi
+            requests:
+              cpu: 25m
+              memory: 350Mi
+          env:
+            - name: "JAVA_TOOL_OPTIONS"
+              value: "-XX:MinRAMPercentage=60.0 -XX:MaxRAMPercentage=80.0"
+            - name: "SPRING_PROFILES_ACTIVE"
+              value: deploy,{{ .Values.environment }}
+            - name: "K8S_NAMESPACE"
+              value: {{ .Values.namespace }}
+            - name: "NEW_RELIC_APP_NAME"
+              value: "workflow-sync-service"
+            - name: "NEW_RELIC_LICENSE_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic-cfg
+                  key: NEW_RELIC_LICENSE_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflow-sync-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    meta.helm.sh/release-name: chart-workflow-sync-service
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: workflow-sync-service
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: workflow-sync-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    meta.helm.sh/release-name: chart-workflow-sync-service
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: workflow-sync-service.{{ .Values.environment }}.{{ .Values.domain }}
+      http:
+        paths:
+          - path: /workflow-sync-service
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: workflow-sync-service
+                port:
+                  number: 80
+
+---
+

@@ -1,0 +1,21 @@
+// This file is used by gradle to define multi-project builds or explicitly set
+// the project name.
+
+pluginManagement {
+    repositories {
+        maven {
+            credentials {
+                username settings['sni.maven.deployer.username']
+                password settings['sni.maven.deployer.password']
+            }
+            url settings['sni.maven.download.url']
+        }
+    }
+}
+
+rootProject.name = 'workflow-sync-service'
+
+include 'workflow-sync-service-api'
+include 'workflow-sync-service'
+include 'workflow-sync-service-test'
+

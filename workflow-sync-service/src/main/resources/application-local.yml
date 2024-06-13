@@ -1,0 +1,29 @@
+# These values are used when the Spring 'local' profile is active. This is
+# intended for running the application locally in standalone mode.
+#
+logging:
+  file:
+    name: build/logs/application.log
+
+# Database settings. Currently presumes a docker postgres instance and an
+# env variable named POSTGRES_HOST_IP with the IP address. Note that the \$
+# prevents the build from replacing the variable with resource filtering.
+# Replace POSTGRES_SCHEMA with your DB's schema. RDS terraform will create a schema for each DB to leverage.
+# Liquibase execution will also use this URL and therefore manipulate objects in this schema
+spring:
+  datasource:
+    url: jdbc:postgresql://\${POSTGRES_HOST_IP}:5432/docker?currentSchema=\${POSTGRES_SCHEMA}
+    # database credentials should come from AWS Secret Manager
+    # and the following configuration should be moved to application.yaml for all application profiles to use.
+    # see https://github.com/discoveryinc-cs/springboot-workflow-sync-service/wiki/AWS-Secrets-Manager-Integration for details
+    username: docker
+    password: docker
+    driver-class-name: org.postgresql.Driver
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "*"
+

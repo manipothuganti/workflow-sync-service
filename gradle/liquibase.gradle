@@ -1,0 +1,117 @@
+/*
+ * Support for Liquibase Migrations
+ * Now using the standard gradle liquibase plugin and all liquibase commands can be leveraged.
+ *
+ * All tasks defined require a project property for the target environment
+ * (e.g, local, dev, qa, uat, prod). (defaults to local). This property name is
+ * 'liquibase.migration.environment'. This is used to determine the env properties (jdbc url) from
+ * the application-<env>.yml file. This properties file should
+ * contain the appropriate datasource url settings for the migration to be applied.
+ *
+ * username & password for connections to DB should come from LIQUIBASE_COMMAND_USERNAME and LIQUIBASE_COMMAND_PASSWORD
+ * environment variables. Within a Jenkins pipeline, the JPL function withLiquibaseCommandSecrets will provide the
+ * master creds for your DB
+ *
+ *
+ */
+
+dependencies {
+    liquibaseRuntime "org.liquibase:liquibase-core:${liquibaseVersion}"
+    liquibaseRuntime "org.postgresql:postgresql:${postgresVersion}"
+    liquibaseRuntime "info.picocli:picocli:4.7.5"
+    liquibaseRuntime "javax.xml.bind:jaxb-api:2.3.1"
+}
+/*
+  Intercept all calls to liquibase plugin tasks to be able to setup runtime specific environment parameters.
+  Additionally prevent dropAll from working in UAT/PROD to prevent horrible accidents.
+ */
+tasks.each { task ->
+    if (task.group == 'Liquibase') {
+        task.doFirst {
+            //ensure an environment name has been provided
+            assert project.hasProperty('liquibase.migration.environment'):
+                    "A liquibase.migration.environment is required [local,dev,qa,uat,prod]."
+
+            //load the DB env from the -Pliquibase.migration.environment
+            def liquibaseEnv = project.ext['liquibase.migration.environment']
+            println "Invoking Liquibase ${task.name} for env=${liquibaseEnv}."
+
+            //Prevent drop on uat/prod here
+            assert !('dropAll'.equalsIgnoreCase(task.name) && ['prod', 'uat'].contains(liquibaseEnv)):
+                    "The Liquibase dropAll command is not allowed for the ${liquibaseEnv} environment."
+
+            //load the JDBC URL from the application-{env}.yml file spring.datasource.url property
+            def yamlfile = new File("${projectDir}/src/main/resources/application-${liquibaseEnv}.yml")
+            def yamlpath = yamlfile.getAbsolutePath()
+            println "Liquibase environment yaml file path: ${yamlpath}"
+            def yaml = yamlfile.text
+            def liquibaseUrl = readYamlProperty('spring.datasource.url', yaml)
+            println("Liquibase JDBC url: ${liquibaseUrl}")
+
+            //setup the liquibase configuration
+            //Note username/password are expected to be set via env variables
+            //LIQUIBASE_COMMAND_USERNAME/LIQUIBASE_COMMAND_PASSWORD
+            liquibase {
+                activities {
+                    main {
+                        changelogFile "${project.name}/src/main/resources/db/changelog/db.changelog-master.xml"
+                        url liquibaseUrl
+                        outputFile "${project.name}/build/liquibase/${project.name}-${project.version}-${task.name}-${liquibaseEnv}.sql"
+                        logLevel "warning"
+
+                        if (project.hasProperty('liquibase.migration.context')) {
+                            contexts project.ext['liquibase.migration.context']
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+def readYamlProperty(String property, String yaml) {
+    def fragments = property.split('\\.')
+    def lines = yaml.split('\n')
+    def position = []
+
+    int i = 0
+
+    for (line in lines) {
+        if (line.isBlank() || line.trim().startsWith('#')) {
+            continue
+        }
+
+        def spaces = line.indexOf(line.trim())
+
+        if (spaces == 0) {
+            position = []
+        }
+
+        line = line.trim()
+
+        if (line.startsWith(fragments[i].trim())) {
+            position[i] = true
+            i++
+        }
+
+        if (position.size() == fragments.size()) {
+            def match = true
+            for (boolean entry : position) {
+                if (!entry) {
+                    match = false
+                    break
+                }
+            }
+
+            if (match) {
+                def tokens = line.split(': ')
+                def value = tokens[1].trim().replaceAll("^\"|^\'|\"\$|\'\$", "")
+                logger.info(property + " == " + value)
+                return value
+            }
+        }
+
+    }
+    return null
+}

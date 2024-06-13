@@ -1,0 +1,92 @@
+// Sets up jacoco for test coverage. Defines additional types of test for
+// integration and functional testing purposes.
+
+apply plugin: 'jacoco'
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    executionData {
+        tasks.withType(Test).findAll { it.jacoco.destinationFile.exists() }*.jacoco.destinationFile
+    }
+
+    reports {
+        html.required = false
+        xml.required = true
+    }
+}
+
+sourceSets {
+    integrationTest {
+        java.srcDir file('src/integration-test/java')
+        resources.srcDir file('src/integration-test/resources')
+        compileClasspath = sourceSets.main.output + configurations.testCompileClasspath + sourceSets.test.output
+        runtimeClasspath = output + compileClasspath + configurations.testRuntimeClasspath
+    }
+    functionalTest {
+        java.srcDir file('src/functional-test/java')
+        resources.srcDir file('src/functional-test/resources')
+        compileClasspath = sourceSets.main.output + configurations.testCompileClasspath + sourceSets.test.output
+        runtimeClasspath = output + compileClasspath + configurations.testRuntimeClasspath
+    }
+}
+
+task integrationtest(type: Test) {
+    description = 'Runs the integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    reports.junitXml.outputLocation = file("${reports.junitXml.outputLocation.get()}/integration")
+
+    finalizedBy jacocoTestReport
+}
+
+task functionaltest(type: Test) {
+    description = 'Runs automated functional tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    reports.junitXml.outputLocation = file("${reports.junitXml.outputLocation.get()}/functional")
+
+    jacoco {
+        enabled = false
+    }
+}
+
+tasks.withType(Test) {
+    reports.html.outputLocation = file("${reporting.baseDir}/${name}")
+
+    def usetags = project.findProperty('test.includes')
+    def omittags = project.findProperty('test.excludes')
+
+    useJUnitPlatform {
+        usetags?.tokenize(',').each() {
+            includeTags it
+        }
+        omittags?.tokenize(',').each() {
+            excludeTags it
+        }
+    }
+
+    def testenv = System.getProperty("test.environment", "local")
+    def testurl = System.getProperty("application.base.api.url")
+
+    if (!testurl && testenv) {
+        testurl = testenv == 'local' ? "http://localhost:8080" : "http://workflow-sync-service.${testenv}.dcitech.cloud"
+    }
+
+    doFirst {
+        logger.info("Using test includes - ${usetags}")
+        logger.info("Using test excludes - ${omittags}")
+        logger.info("Using test environment - ${testenv}")
+        logger.info("Using test endpoint URL - ${testurl}")
+    }
+
+    // System properties to be passed to tests can be defined here.
+    systemProperty 'application.base.api.url', testurl
+    systemProperty 'test.environment', testenv
+}

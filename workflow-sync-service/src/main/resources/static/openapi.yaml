@@ -1,0 +1,132 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: workflow-sync-service Service
+  description: This YAML is to be updated manually to remain in sync with the API.
+  contact:
+    email: dl-turbo@discovery.com
+servers:
+  - url: http://workflow-sync-service.{env}.dcitech.cloud/workflow-sync-service/api/v1
+    description: workflow-sync-service Service
+    variables:
+      env:
+        enum:
+          - dev
+          - qa
+          - uat
+          - prod
+        default: dev
+paths:
+  /messages/{id}:
+    get:
+      summary: get message by id
+      description: get message by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: the message with provided id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StarterMessage'
+        400:
+          description: Invalid parameters (likely invalid UUID)
+          headers:
+            Warning:
+              description: Information about the validation error
+              schema:
+                type: string
+        404:
+          description: no message found with provided id
+        500:
+          description: Unexpected error
+          headers:
+            Warning:
+              description: Information about the unexpected error
+              schema:
+                type: string
+    put:
+      summary: upsert a message
+      description: create or replace a message
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Message to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StarterMessage'
+      responses:
+        200:
+          description: successfully inserted/updated returns the message back
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StarterMessage'
+        400:
+          description: Invalid parameters
+          headers:
+            Warning:
+              description: Information about the validation error
+              schema:
+                type: string
+        500:
+          description: Unexpected error
+          headers:
+            Warning:
+              description: Information about the unexpected error
+              schema:
+                type: string
+  /messages:
+    get:
+      summary: get all messages
+      description: get all messages
+      responses:
+        200:
+          description: an object contiaing an array of all the messages (could be an empty list)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StarterMessageList'
+        500:
+          description: Unexpected error
+          headers:
+            Warning:
+              description: Information about the unexpected error
+              schema:
+                type: string
+components:
+  schemas:
+    StarterMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        reversed:
+          type: string
+        userName:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    StarterMessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/StarterMessage'

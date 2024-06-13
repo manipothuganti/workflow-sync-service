@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProfile name="local,default,dev,qa">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+        <logger name="com.discovery" level="DEBUG"/>
+        <logger name="com.wbd" level="DEBUG"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="uat,prod">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <logger name="com.discovery" level="INFO"/>
+        <logger name="com.wbd" level="INFO"/>
+
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- Uncomment if your deployment target is not Kubernetes
+        <springProfile name="dev,qa">
+            <include resource="logback-file-appender.xml"/>
+            <logger name="com.discovery" level="DEBUG" />
+            <logger name="com.wbd" level="DEBUG" />
+
+            <root level="INFO">
+                <appender-ref ref="FILE" />
+            </root>
+        </springProfile>
+        <springProfile name="uat,prod">
+            <include resource="logback-file-appender.xml"/>
+            <logger name="com.discovery" level="INFO" />
+            <logger name="com.wbd" level="INFO" />
+
+            <root level="WARN">
+                <appender-ref ref="FILE" />
+            </root>
+        </springProfile>
+        <springProfile name="local,default">
+            <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+            <logger name="com.discovery" level="DEBUG" />
+            <logger name="com.wbd" level="DEBUG" />
+            <root level="INFO">
+                <appender-ref ref="CONSOLE" />
+            </root>
+        </springProfile>
+    -->
+
+</configuration>

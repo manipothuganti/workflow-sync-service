@@ -1,0 +1,66 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
+    id 'org.liquibase.gradle' version '2.2.1'
+}
+
+configurations {
+    // org.aopalliance classes are repackaged into spring-aop which comes from the spring-web dependency
+    //they are also repackaged into this aopalliance-repackaged module, lets exclude this to avoid duplicate classes
+    //on the classpath
+    all*.exclude group: 'org.glassfish.hk2.external', module: 'aopalliance-repackaged'
+
+    //Added so that the maven-publish plugin can publish the result of bootjar
+    [apiElements, runtimeElements].each {
+        it.outgoing.artifacts.removeIf {
+            it.buildDependencies.getDependencies(null).contains(jar)
+        }
+        it.outgoing.artifact(bootJar)
+    }
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply from: "${rootDir}/gradle/docker.gradle"
+apply from: "${rootDir}/gradle/liquibase.gradle"
+
+dependencies {
+    implementation project(':workflow-sync-service-api')
+
+    annotationProcessor("org.springframework:spring-context-indexer")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jersey")
+    implementation("org.springframework.boot:spring-boot-starter-json")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("com.wbd.foundry:sf-filter:2.0.0")
+
+//    If you want spring data jpa and postgres connectivity
+//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+//    runtimeOnly("org.postgresql:postgresql:${postgresVersion}")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+springBoot {
+    buildInfo()
+}
+bootRun {
+    jvmArgs = ["-Dspring.profiles.active=local"]
+}
+
+jar {
+    enabled = false
+}
+bootJar {
+    manifest {
+        attributes('Implementation-Version': archiveVersion)
+    }
+    archiveClassifier = ''
+}
+
+processResources {
+    filesMatching(['application*.yml', 'banner.txt']) {
+        expand(project.properties)
+    }
+}

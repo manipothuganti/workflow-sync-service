@@ -1,0 +1,17 @@
+apply plugin: 'org.sonarqube'
+
+def ignorebase = 'src/main/java/com/wbd/distribute/workflowsyncservice'
+
+sonar {
+    properties {
+        //place project wide sonar properties here if needed
+    }
+}
+
+subprojects {
+    sonar {
+        properties {
+            property "sonar.coverage.exclusions", "$ignorebase/config/**, $ignorebase/api/**, $ignorebase/Application.java"
+        }
+    }
+}

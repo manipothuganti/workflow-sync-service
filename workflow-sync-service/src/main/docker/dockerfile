@@ -1,0 +1,9 @@
+FROM 250312325083.dkr.ecr.us-east-1.amazonaws.com/msc-corretto21:latest
+VOLUME ["/tmp"]
+USER app
+
+WORKDIR /app
+ADD ${project.name}-${version}.jar .
+EXPOSE 8080
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-javaagent:/app/newrelic/newrelic.jar", "-jar", "${project.name}-${version}.jar"]
+

@@ -1,0 +1,52 @@
+# Values defined herein are the default for the application and can be
+# overridden in various ways.
+# http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html
+
+management:
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: ALWAYS
+spring:
+  threads:
+    virtual:
+      enabled: true
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+    serialization:
+      indent-output: true
+      write_dates_as_timestamps: false
+  jersey:
+    servlet:
+      load-on-startup: 1
+
+server:
+  servlet:
+    context-path: /workflow-sync-service
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  forward-headers-strategy: framework
+  shutdown: graceful
+info:
+  env:
+    spring:
+      activeProfile: \${spring.profiles.active}
+
+

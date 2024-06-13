@@ -1,0 +1,10 @@
+// This is an API project. If you think you need to add dependencies,
+// please close this file and take a moment to reflect.
+
+//overall project targets Java 21, but have the API module target Java 17 so older projects that haven't yet migrated
+// to Java 21 can use the library
+//If upgrading an existing project to latest starter, it maybe necessary to move this even older (1.8)
+java {
+    sourceCompatibility = 17
+    targetCompatibility = 17
+}

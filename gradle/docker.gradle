@@ -1,0 +1,10 @@
+def stageDir = 'build/docker'
+
+task dockerprep(type: Copy, dependsOn: bootJar) {
+    from('src/main/docker') {
+        expand(project.properties)
+    }
+    from bootJar
+    into stageDir
+}
+

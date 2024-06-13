@@ -1,0 +1,17 @@
+{
+    "AppName": "workflow-sync-service",
+    "DNSName": "workflow-sync-service",
+    "Healthcheck": "http:8080/workflow-sync-service/actuator/info",
+    "Platform": "springboot",
+    "TagBusUnit": "contentdelivery",
+    "TagEnv": "dev",
+    "TagOwner": "dl-turbo@discovery.com",
+    "TagProject": "workflow-sync-service",
+    "springboot_deploy::app_deploy_file_ext": "jar",
+    "springboot_deploy::app_deploy_name": "workflow-sync-service",
+    "springboot_deploy::custom_jdk": "java-17-amazon-corretto",
+    "springboot_deploy::extra_startup_params": "--spring.profiles.active=dev",
+    "springboot_deploy::health_uri": "/workflow-sync-service/actuator/info",
+    "springboot_deploy::prefix_url": "https://repo.sniglobalmedia.com/public/com/wbd/distribute/workflowsyncservice",
+    "AccountRoleArn": "arn:aws:iam::224174657993:role/mam-jenkins"
+}

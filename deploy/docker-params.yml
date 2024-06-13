@@ -1,0 +1,6 @@
+name: workflow-sync-service
+account: '250312325083'
+images:
+  ecr:
+    corretto21: 250312325083.dkr.ecr.us-east-1.amazonaws.com/msc-corretto21:latest
+

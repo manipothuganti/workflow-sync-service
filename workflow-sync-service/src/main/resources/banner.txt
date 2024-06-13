@@ -1,0 +1,3 @@
+ >>>  ${name}
+ >>>  .... \${application.version}
+ >>>  .... Built on Spring Boot \${spring-boot.formatted-version}

@@ -1,0 +1,71 @@
+apply from: "${rootDir}/gradle/sonar.gradle"
+
+buildscript {
+    repositories {
+        maven {
+            credentials {
+                username project['sni.maven.deployer.username']
+                password project['sni.maven.deployer.password']
+            }
+            url project['sni.maven.download.url']
+        }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:5.0.0.4638"
+    }
+}
+
+
+allprojects {
+    apply from: "${rootDir}/gradle/version.gradle"
+
+    group = 'com.wbd.distribute.workflowsyncservice'
+
+    ext {
+        liquibaseVersion = "4.27.0"
+        postgresVersion = "42.7.3"
+        junitVersion = "5.10.2"
+    }
+    repositories {
+        maven {
+            credentials {
+                username project['sni.maven.deployer.username']
+                password project['sni.maven.deployer.password']
+            }
+            url project['sni.maven.download.url']
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply from: "${rootDir}/gradle/artifacts.gradle"
+    apply from: "${rootDir}/gradle/testing.gradle"
+
+    jar {
+        manifest {
+            attributes('Implementation-Version': archiveVersion)
+        }
+    }
+
+    java {
+        sourceCompatibility = 21
+        targetCompatibility = 21
+        compileJava.options.encoding = 'UTF-8'
+        compileTestJava.options.encoding = 'UTF-8'
+        javadoc.options.encoding = 'UTF-8'
+    }
+
+    javadoc {
+        options.addBooleanOption('html5', true)
+    }
+
+    dependencies {
+        testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    }
+}
+
+wrapper {
+    gradleVersion = '8.7'
+}

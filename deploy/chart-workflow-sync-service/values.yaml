@@ -1,0 +1,9 @@
+image:
+  repository: 250312325083.dkr.ecr.us-east-1.amazonaws.com/workflow-sync-service
+  tag: 0.0.1
+  pullPolicy: Always
+
+namespace: distribute
+
+domain: blank
+environment: blank

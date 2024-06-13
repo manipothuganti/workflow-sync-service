@@ -1,0 +1,9 @@
+{
+  "repo": "libs-releases-local",
+  "group": "com/wbd/distribute/workflowsyncservice",
+  "artifacts": [
+    "workflow-sync-service",
+    "workflow-sync-service-test",
+    "workflow-sync-service-api"
+  ]
+}

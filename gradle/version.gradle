@@ -1,0 +1,23 @@
+version = new ProjectVersion(1, 0, 0, System.env.BUILD_NUMBER)
+
+class ProjectVersion {
+    Integer major
+    Integer minor
+    Integer patch
+    String build
+
+    ProjectVersion(Integer major, Integer minor, Integer patch, String build) {
+        this.major = major
+        this.minor = minor
+        this.patch = patch
+        this.build = build
+    }
+
+    @Override
+    String toString() {
+        String v = "$major.$minor.$patch"
+        v += (build) ? ".$build" : "-SNAPSHOT"
+        return v
+    }
+}
+

@@ -1,0 +1,21 @@
+apply plugin: "maven-publish"
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username project['sni.maven.deployer.username']
+                password project['sni.maven.deployer.password']
+            }
+            url = (version.build)
+                    ? project.getProperty('sni.maven.deployer.release.url')
+                    : project.getProperty('sni.maven.deployer.snapshot.url')
+        }
+    }
+}
