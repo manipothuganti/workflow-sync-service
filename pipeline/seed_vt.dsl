@@ -1,4 +1,4 @@
-String basepath = 'NLCD/job/workflow-sync-service'
+String basepath = 'NLCD/workflow-sync-service'
 
 String giturl = 'git@github.com:discoveryinc-cs/workflow-sync-service.git'
 

@@ -6,7 +6,7 @@ String application = 'workflow-sync-service'
 String owner = 'dl-turbo@discovery.com'
 String chartname = 'chart-workflow-sync-service'
 String namespace = 'distribute'
-String liquibaseVaultDBName = 'planning'
+String liquibaseVaultDBName = ''
 
 boolean deploy_to_prod = true
 

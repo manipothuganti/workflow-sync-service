@@ -1,0 +1,11 @@
+omd_business_service:
+  name: media-supply-chain
+
+omd_service:
+  name: distribute
+  description: The Workflow Sync Service (WSS) is part of the Distribute Planner application. It is responsible for maintaining Planner app tasks for each workflow context in WFTS, ensuring they are in sync with changes happening in the Planner (NLCdplan, planning-dv). WSS consumes Playlist Event Generator (PEG) events to update WFTS.
+
+omd_schema_version: v1.0.0
+
+# Used for tracking the repository in WBD inventory. Do not remove or alter the content.
+inventory_id: 980162270ee0cf69c2e3a0a0a87dd93d-e8e885e0931c2c609d3059f840c02b70

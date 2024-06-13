@@ -5,7 +5,7 @@ String giturl = 'git@github.com:discoveryinc-cs/workflow-sync-service.git'
 String application = 'workflow-sync-service'
 String deploy_project = 'workflow-sync-service'
 String owner = 'dl-turbo@discovery.com'
-String liquibaseVaultDBName = 'planning'
+String liquibaseVaultDBName = ''
 
 def common = new PipelineSupport()
 
