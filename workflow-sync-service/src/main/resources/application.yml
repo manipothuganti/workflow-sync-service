@@ -49,4 +49,5 @@ info:
     spring:
       activeProfile: \${spring.profiles.active}
 
-
+sqs-visibility:
+  max-extensions: 10

@@ -27,3 +27,40 @@ management:
       exposure:
         include: "*"
 
+playlistEventsWorkflowSyncQueue: https://sqs.us-east-1.amazonaws.com/224174657993/dev-wss-playlist-events.fifo
+
+remote-services:
+  workflowTrackingService:
+    base-url: http://workflowtrackingservice.dev.dcitech.cloud/workflow-tracking/v1/
+    content-type: application/json
+    cache-reset: false
+
+  nlcdConfigService:
+    base-url: http://nlcdconfig.dev.dcitech.cloud/nlcdconfig-ws/api/v1/
+    content-type: application/json
+    cache-reset: true
+
+  # Program Schedule Service
+  programScheduleServiceConfig:
+    base-url: https://pss.dev.dcitech.cloud/pss/api/v3
+    read.timeout: 60000
+    connection.timeout: 60000
+
+  # Alternate Inventory Service
+  alternateInventoryConfig:
+    base-url: https://alternate-inventory-service.dev.dcitech.cloud/alternate-inventory-service/api/v1
+    read.timeout: 60000
+    connection.timeout: 60000
+
+  # Metadata Extension Service (MES)
+  metadataExtensionServiceConfig:
+    base-url: http://metadata-extension-service.dev.dcitech.cloud/metadata-extension-service/api/v1
+    read.timeout: 60000
+    connection.timeout: 60000
+
+  distributeClearService:
+    base-url: https://distribute-clear-service.dev.dcitech.cloud/distribute-clear-service/api/v1/
+
+  default-read-timeout: 60000
+  default-connection-timeout: 60000
+  scheduler-max-threads: 2000

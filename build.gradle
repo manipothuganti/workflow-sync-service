@@ -22,9 +22,16 @@ allprojects {
     group = 'com.wbd.distribute.workflowsyncservice'
 
     ext {
+        springCloudVersion = '2021.0.7'
+        springCloudAwsVersion = '2.4.4'
+        awsSdkVersion = '1.12.492'
         liquibaseVersion = "4.27.0"
         postgresVersion = "42.7.3"
         junitVersion = "5.10.2"
+        playlistEventGenApi = "1.0.0.183"
+        playlistApi = "2.0.0.340"
+        wftsVersion = "3.0.4"
+        rxJavaVersion = '3.1.5'
     }
     repositories {
         maven {
@@ -63,6 +70,7 @@ subprojects {
     dependencies {
         testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+        implementation("com.google.guava:guava:18.0")
     }
 }
 

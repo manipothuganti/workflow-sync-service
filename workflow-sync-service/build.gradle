@@ -24,6 +24,20 @@ apply plugin: 'io.spring.dependency-management'
 apply from: "${rootDir}/gradle/docker.gradle"
 apply from: "${rootDir}/gradle/liquibase.gradle"
 
+ext {
+    set("awsSdkVersion", "2.23.18")
+    set("springCloudVersion", "2023.0.0")
+    set("springCloudAwsVersion", "3.1.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+        mavenBom "software.amazon.awssdk:bom:${awsSdkVersion}"
+    }
+}
+
 dependencies {
     implementation project(':workflow-sync-service-api')
 
@@ -35,6 +49,20 @@ dependencies {
 
     implementation("com.wbd.foundry:sf-filter:2.0.0")
 
+    implementation platform("com.amazonaws:aws-java-sdk-bom:1.12.449")
+    implementation('com.amazonaws:aws-java-sdk-sqs')
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
+    implementation("com.wbd.distribute.playlisteventgenerator:playlist-event-generator-api:${playlistEventGenApi}")
+    implementation("com.discovery.playlistservice:playlist-service-api:${playlistApi}")
+    implementation("com.scrippsnetworks.nonlinear.workflow.tracking:workflow-tracking-service-api:${wftsVersion}")
+    implementation("io.reactivex.rxjava3:rxjava:${rxJavaVersion}")
+    implementation("commons-collections:commons-collections:3.2.1")
+    implementation("org.springframework.cloud:spring-cloud-starter")
+    implementation("com.discovery.foundry:sf-sentry:2.5.0")
+    implementation("com.discovery.foundry:sf-filter:1.5.0")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("com.google.code.gson:gson:2.10")
 //    If you want spring data jpa and postgres connectivity
 //    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 //    runtimeOnly("org.postgresql:postgresql:${postgresVersion}")

@@ -1,19 +1,17 @@
 package com.wbd.distribute.workflowsyncservice.resource;
 
-import jakarta.inject.Named;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
+import com.wbd.distribute.playlisteventgenerator.api.PlannerEvent;
 import com.wbd.distribute.workflowsyncservice.action.StarterMessageData;
 import com.wbd.distribute.workflowsyncservice.api.StarterMessage;
 import com.wbd.distribute.workflowsyncservice.api.StarterMessageList;
+import com.wbd.distribute.workflowsyncservice.service.PlaylistEventReader;
+import jakarta.inject.Named;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * This is a sample jax-rs Jersey ReST service that produces and consumes
@@ -24,6 +22,9 @@ import com.wbd.distribute.workflowsyncservice.api.StarterMessageList;
 @Path("/messages")
 @Produces(MediaType.APPLICATION_JSON)
 public class StarterEndpoint {
+
+    @Autowired
+    PlaylistEventReader playlistEventReader;
 
     StarterMessageData data = new StarterMessageData();
 
@@ -55,4 +56,9 @@ public class StarterEndpoint {
         }
     }
 
+    @POST
+    @Path("/wss/test")
+    public void pegMock(@RequestBody PlannerEvent plannerEvent) {
+        playlistEventReader.process(plannerEvent);
+    }
 }
